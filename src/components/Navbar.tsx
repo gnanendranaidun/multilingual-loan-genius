@@ -1,10 +1,12 @@
 
 import { useState, useEffect } from 'react';
 import { LanguageSelector } from './LanguageSelector';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     setMounted(true);
@@ -35,7 +37,7 @@ export const Navbar = () => {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md animate-pulse-subtle"></div>
-          <span className="font-medium text-lg tracking-tight">LoanGenius</span>
+          <span className="font-medium text-lg tracking-tight">{t('appName')}</span>
         </div>
         
         <nav className="flex items-center gap-1 sm:gap-4">

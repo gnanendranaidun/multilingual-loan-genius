@@ -9,39 +9,41 @@ import {
   BarChart3,
   GraduationCap
 } from 'lucide-react';
-
-// Loan advisor features
-const features = [
-  {
-    icon: <CheckCircle2 className="h-6 w-6" />,
-    title: 'Loan Eligibility',
-    description: 'Check if you qualify for loans based on your financial profile.'
-  },
-  {
-    icon: <CircleDollarSign className="h-6 w-6" />,
-    title: 'Rate Comparison',
-    description: 'Compare interest rates and find the best loan terms for your needs.'
-  },
-  {
-    icon: <FileText className="h-6 w-6" />,
-    title: 'Application Guidance',
-    description: 'Step-by-step assistance through the loan application process.'
-  },
-  {
-    icon: <BarChart3 className="h-6 w-6" />,
-    title: 'Financial Analysis',
-    description: 'Get insights into how loans affect your overall financial health.'
-  },
-  {
-    icon: <GraduationCap className="h-6 w-6" />,
-    title: 'Financial Education',
-    description: 'Learn about loan types, terms, and financial best practices.'
-  }
-];
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const LoanAdvisor = () => {
   const [activeTab, setActiveTab] = useState<'chat' | 'about'>('chat');
   const { messages, isTyping, addMessage } = useChat();
+  const { t } = useLanguage();
+
+  // Loan advisor features
+  const features = [
+    {
+      icon: <CheckCircle2 className="h-6 w-6" />,
+      title: t('loanEligibility'),
+      description: t('loanEligibilityDesc')
+    },
+    {
+      icon: <CircleDollarSign className="h-6 w-6" />,
+      title: t('rateComparison'),
+      description: t('rateComparisonDesc')
+    },
+    {
+      icon: <FileText className="h-6 w-6" />,
+      title: t('applicationGuidance'),
+      description: t('applicationGuidanceDesc')
+    },
+    {
+      icon: <BarChart3 className="h-6 w-6" />,
+      title: t('financialAnalysis'),
+      description: t('financialAnalysisDesc')
+    },
+    {
+      icon: <GraduationCap className="h-6 w-6" />,
+      title: t('financialEducation'),
+      description: t('financialEducationDesc')
+    }
+  ];
 
   return (
     <section id="advisor" className="py-12 sm:py-16">
@@ -57,7 +59,7 @@ export const LoanAdvisor = () => {
               }`}
               onClick={() => setActiveTab('chat')}
             >
-              Conversation
+              {t('conversation')}
             </button>
             <button
               className={`flex-1 py-4 text-center font-medium transition-all duration-200 ${
@@ -67,7 +69,7 @@ export const LoanAdvisor = () => {
               }`}
               onClick={() => setActiveTab('about')}
             >
-              About
+              {t('about')}
             </button>
           </div>
           
@@ -83,9 +85,9 @@ export const LoanAdvisor = () => {
               <div className="h-full overflow-y-auto p-6 sm:p-8">
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-2xl font-bold mb-4">Multilingual Loan Advisor</h2>
+                    <h2 className="text-2xl font-bold mb-4">{t('aboutTitle')}</h2>
                     <p className="text-gray-600 dark:text-gray-300">
-                      Your AI-powered financial assistant that helps you navigate the complex world of loans and financing options. Get personalized guidance, check your eligibility, and receive step-by-step support throughout your loan journey.
+                      {t('aboutDescription')}
                     </p>
                   </div>
                   
@@ -109,9 +111,9 @@ export const LoanAdvisor = () => {
                   </div>
                   
                   <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800/30">
-                    <h3 className="text-lg font-semibold mb-2">Privacy & Security</h3>
+                    <h3 className="text-lg font-semibold mb-2">{t('privacy')}</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Your financial information is securely encrypted and never shared with third parties without your explicit consent. We adhere to the highest standards of data protection to ensure your personal and financial information remains confidential.
+                      {t('privacyDescription')}
                     </p>
                   </div>
                 </div>

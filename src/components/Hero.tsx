@@ -1,8 +1,10 @@
 
 import { useState, useEffect } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -20,7 +22,7 @@ export const Hero = () => {
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
           }`}
         >
-          Multilingual Financial Advisor
+          {t('multilingual')}
         </span>
         
         <h1 
@@ -28,7 +30,7 @@ export const Hero = () => {
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
           }`}
         >
-          Your <span className="text-gradient">Intelligent</span> Loan Assistant
+          {t('heroTitle')}
         </h1>
         
         <p 
@@ -36,7 +38,7 @@ export const Hero = () => {
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
           }`}
         >
-          Explore loan options, check eligibility, and get financial guidance in your language—all in one seamless conversation.
+          {t('heroSubtitle')}
         </p>
         
         <div 
@@ -48,12 +50,12 @@ export const Hero = () => {
             href="#advisor" 
             className="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-white shadow-md hover:bg-blue-700 transition-all duration-200 transform hover:scale-[1.03] active:scale-[0.97]"
           >
-            Start Conversation
+            {t('startConversation')}
           </a>
           <button 
             className="inline-flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-700 px-6 py-3 text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-slate-700 transition-all duration-200 transform hover:scale-[1.03] active:scale-[0.97]"
           >
-            Learn More
+            {t('learnMore')}
           </button>
         </div>
       </div>
