@@ -1,0 +1,145 @@
+
+import { useState, useRef, useEffect } from 'react';
+import { Send, Mic, StopCircle } from 'lucide-react';
+import { Message } from '@/hooks/useChat';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
+interface ChatInterfaceProps {
+  messages: Message[];
+  isTyping: boolean;
+  onSendMessage: (message: string) => void;
+}
+
+export const ChatInterface = ({ 
+  messages, 
+  isTyping, 
+  onSendMessage 
+}: ChatInterfaceProps) => {
+  const [inputValue, setInputValue] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inputValue.trim()) {
+      onSendMessage(inputValue);
+      setInputValue('');
+    }
+  };
+  
+  const toggleRecording = () => {
+    // In a real implementation, this would use the Web Speech API
+    // or another speech recognition service
+    setIsRecording(!isRecording);
+    
+    if (!isRecording) {
+      // Simulate speech recognition after a delay
+      setTimeout(() => {
+        setIsRecording(false);
+        const simulatedText = "Can you tell me about personal loans?";
+        setInputValue(simulatedText);
+      }, 3000);
+    }
+  };
+  
+  return (
+    <div className="flex flex-col h-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-md rounded-2xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-800">
+      {/* Chat messages */}
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="space-y-4">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex ${
+                message.role === 'user' ? 'justify-end' : 'justify-start'
+              }`}
+            >
+              <div
+                className={`max-w-[80%] px-4 py-3 rounded-2xl ${
+                  message.role === 'user'
+                    ? 'bg-blue-600 text-white rounded-tr-none'
+                    : 'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200 rounded-tl-none'
+                } shadow-sm animate-scale-in`}
+              >
+                <p className="text-sm sm:text-base">{message.content}</p>
+                <span className="text-xs opacity-70 mt-1 block text-right">
+                  {message.timestamp.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
+                </span>
+              </div>
+            </div>
+          ))}
+          
+          {isTyping && (
+            <div className="flex justify-start">
+              <div className="bg-gray-100 dark:bg-slate-800 px-4 py-3 rounded-2xl rounded-tl-none shadow-sm max-w-[80%]">
+                <div className="flex space-x-2">
+                  <div className="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 animate-pulse"></div>
+                  <div className="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+      
+      {/* Input area */}
+      <div className="border-t border-gray-200 dark:border-gray-800 p-4">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <Button
+            type="button"
+            size="icon"
+            variant="outline"
+            className="shrink-0 h-10 w-10 rounded-full transition-all duration-200"
+            onClick={toggleRecording}
+          >
+            {isRecording ? (
+              <StopCircle className="h-5 w-5 text-red-500" />
+            ) : (
+              <Mic className="h-5 w-5" />
+            )}
+          </Button>
+          
+          <div className="relative flex-1">
+            <Input
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Type your message..."
+              className="pr-10 py-5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-full focus-visible:ring-blue-500"
+            />
+            {isRecording && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="flex items-center space-x-1">
+                  <div className="w-1.5 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  <div className="w-1.5 h-5 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-1.5 h-4 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-1.5 h-6 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }}></div>
+                  <div className="w-1.5 h-3 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <Button
+            type="submit"
+            size="icon"
+            className="shrink-0 h-10 w-10 rounded-full bg-blue-600 hover:bg-blue-700 transition-all duration-200"
+            disabled={!inputValue.trim()}
+          >
+            <Send className="h-5 w-5" />
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+};
