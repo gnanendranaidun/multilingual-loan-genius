@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export type Language = {
@@ -16,6 +15,17 @@ export const languages: Language[] = [
   { code: 'zh', name: '中文', flag: '🇨🇳' },
   { code: 'ja', name: '日本語', flag: '🇯🇵' },
   { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+  // Adding Indian languages
+  { code: 'en-IN', name: 'English (India)', flag: '🇮🇳' },
+  { code: 'bn-IN', name: 'বাংলা', flag: '🇮🇳' },
+  { code: 'gu-IN', name: 'ગુજરાતી', flag: '🇮🇳' },
+  { code: 'kn-IN', name: 'ಕನ್ನಡ', flag: '🇮🇳' },
+  { code: 'ml-IN', name: 'മലയാളം', flag: '🇮🇳' },
+  { code: 'mr-IN', name: 'मराठी', flag: '🇮🇳' },
+  { code: 'od-IN', name: 'ଓଡ଼ିଆ', flag: '🇮🇳' },
+  { code: 'pa-IN', name: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
+  { code: 'ta-IN', name: 'தமிழ்', flag: '🇮🇳' },
+  { code: 'te-IN', name: 'తెలుగు', flag: '🇮🇳' },
 ];
 
 // Define translations for different languages
@@ -228,6 +238,98 @@ export const translations = {
     applicationGuidanceDesc: "مساعدة خطوة بخطوة من خلال عملية تقديم طلب القرض.",
     financialAnalysisDesc: "احصل على رؤى حول كيفية تأثير القروض على صحتك المالية العامة.",
     financialEducationDesc: "تعرف على أنواع القروض والشروط وأفضل الممارسات المالية."
+  },
+  'en-IN': {
+    // Same as English but with Indian context
+    appName: "LoanGenius India",
+    heroTitle: "Your Intelligent Loan Assistant for India",
+    heroSubtitle: "Explore loan options, check eligibility, and get financial guidance in your language—all in one seamless conversation.",
+    startConversation: "Start Conversation",
+    learnMore: "Learn More",
+    multilingual: "Multilingual Financial Advisor",
+    conversation: "Conversation",
+    about: "About",
+    aboutTitle: "Multilingual Loan Advisor",
+    aboutDescription: "Your AI-powered financial assistant that helps you navigate the complex world of loans and financing options in India. Get personalized guidance, check your eligibility, and receive step-by-step support throughout your loan journey.",
+    privacy: "Privacy & Security",
+    privacyDescription: "Your financial information is securely encrypted and never shared with third parties without your explicit consent. We adhere to the highest standards of data protection to ensure your personal and financial information remains confidential.",
+    // Feature titles
+    loanEligibility: "Loan Eligibility",
+    rateComparison: "Rate Comparison",
+    applicationGuidance: "Application Guidance",
+    financialAnalysis: "Financial Analysis",
+    financialEducation: "Financial Education",
+    // Feature descriptions
+    loanEligibilityDesc: "Check if you qualify for loans based on your financial profile in India.",
+    rateComparisonDesc: "Compare interest rates and find the best loan terms for your needs in the Indian market.",
+    applicationGuidanceDesc: "Step-by-step assistance through the loan application process.",
+    financialAnalysisDesc: "Get insights into how loans affect your overall financial health.",
+    financialEducationDesc: "Learn about loan types, terms, and financial best practices in India."
+  },
+  'bn-IN': {
+    appName: "লোনজিনিয়াস",
+    heroTitle: "আপনার বুদ্ধিমান ঋণ সহকারী",
+    heroSubtitle: "ঋণের বিকল্পগুলি অন্বেষণ করুন, যোগ্যতা যাচাই করুন এবং আপনার ভাষায় আর্থিক নির্দেশনা পান — সবই এক সহজ কথোপকথনে।",
+    startConversation: "কথোপকথন শুরু করুন",
+    learnMore: "আরও জানুন",
+    multilingual: "বহুভাষী আর্থিক পরামর্শদাতা",
+    conversation: "কথোপকথন",
+    about: "সম্পর্কে",
+    aboutTitle: "বহুভাষী ঋণ পরামর্শদাতা",
+    aboutDescription: "আপনার AI-পাওয়ার্ড আর্থিক সহকারী যা আপনাকে ঋণ এবং অর্থায়ন বিকল্পের জটিল বিশ্বে নেভিগেট করতে সাহায্য করে। ব্যক্তিগতকৃত নির্দেশনা পান, আপনার যোগ্যতা যাচাই করুন এবং আপনার ঋণ যাত্রার সময় ধাপে ধাপে সহায়তা পান।",
+    privacy: "গোপনীয়তা এবং নিরাপত্তা",
+    privacyDescription: "আপনার আর্থিক তথ্য নিরাপদে এনক্রিপ্ট করা আছে এবং আপনার স্পষ্ট সম্মতি ছাড়া কখনই তৃতীয় পক্ষের সাথে শেয়ার করা হয় না। আপনার ব্যক্তিগত এবং আর্থিক তথ্য গোপনীয় থাকে তা নিশ্চিত করতে আমরা ডেটা সুরক্ষার সর্বোচ্চ মান মেনে চলি।",
+    loanEligibility: "ঋণের যোগ্যতা",
+    rateComparison: "হার তুলনা",
+    applicationGuidance: "আবেদন নির্দেশিকা",
+    financialAnalysis: "আর্থিক বিশ্লেষণ",
+    financialEducation: "আর্থিক শিক্ষা",
+    loanEligibilityDesc: "আপনার আর্থিক প্রোফাইলের উপর ভিত্তি করে আপনি ঋণের জন্য যোগ্য কিনা তা যাচাই করুন।",
+    rateComparisonDesc: "সুদের হার তুলনা করুন এবং আপনার প্রয়োজনের জন্য সেরা ঋণের শর্তাবলী খুঁজুন।",
+    applicationGuidanceDesc: "ঋণ আবেদন প্রক্রিয়ার মাধ্যমে ধাপে ধাপে সহায়তা।",
+    financialAnalysisDesc: "ঋণ আপনার সামগ্রিক আর্থিক স্বাস্থ্যকে কীভাবে প্রভাবিত করে সে সম্পর্কে অন্তর্দৃষ্টি পান।",
+    financialEducationDesc: "ঋণের প্রকার, শর্তাবলী এবং আর্থিক সেরা অনুশীলন সম্পর্কে জানুন।"
+  },
+  // Basic translations for other Indian languages (for demonstration - in a real app, you'd have complete translations)
+  'gu-IN': {
+    appName: "લોનજીનિયસ",
+    heroTitle: "તમારા બુદ્ધિશાળી લોન સહાયક",
+    // ... add more translations as needed
+  },
+  'kn-IN': {
+    appName: "ಲೋನ್ಜೀನಿಯಸ್",
+    heroTitle: "ನಿಮ್ಮ ಬುದ್ಧಿವಂತ ಸಾಲ ಸಹಾಯಕ",
+    // ... add more translations as needed
+  },
+  'ml-IN': {
+    appName: "ലോൺജീനിയസ്",
+    heroTitle: "നിങ്ങളുടെ ബുദ്ധിമാനായ വായ്പാ സഹായി",
+    // ... add more translations as needed
+  },
+  'mr-IN': {
+    appName: "लोनजीनियस",
+    heroTitle: "तुमचा बुद्धिमान कर्ज सहाय्यक",
+    // ... add more translations as needed
+  },
+  'od-IN': {
+    appName: "ଲୋନଜିନିୟସ୍",
+    heroTitle: "ଆପଣଙ୍କର ବୁଦ୍ଧିମାନ ଋଣ ସହାୟକ",
+    // ... add more translations as needed
+  },
+  'pa-IN': {
+    appName: "ਲੋਨਜੀਨੀਅਸ",
+    heroTitle: "ਤੁਹਾਡਾ ਬੁੱਧੀਮਾਨ ਕਰਜ਼ਾ ਸਹਾਇਕ",
+    // ... add more translations as needed
+  },
+  'ta-IN': {
+    appName: "லோன்ஜீனியஸ்",
+    heroTitle: "உங்கள் அறிவார்ந்த கடன் உதவியாளர்",
+    // ... add more translations as needed
+  },
+  'te-IN': {
+    appName: "లోన్జీనియస్",
+    heroTitle: "మీ తెలివైన రుణ సహాయకుడు",
+    // ... add more translations as needed
   }
 };
 

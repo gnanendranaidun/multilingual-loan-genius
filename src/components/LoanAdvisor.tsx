@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useChat } from '@/hooks/useChat';
 import { ChatInterface } from './ChatInterface';
@@ -13,13 +14,19 @@ import { useLanguage } from '@/contexts/LanguageContext';
 export const LoanAdvisor = () => {
   const [activeTab, setActiveTab] = useState<'chat' | 'about'>('chat');
   const { language, t } = useLanguage();
-  const { messages, isTyping, addMessage } = useChat();
+  const { messages, isTyping, addMessage, addAudioMessage } = useChat();
 
   // Reset chat when language changes
   useEffect(() => {
     // This will trigger a new initial message in the useChat hook
     // because messages will be empty again
   }, [language]);
+
+  // Handle audio submission
+  const handleAudioSubmission = (audioBlob: Blob) => {
+    // Call the addAudioMessage function from useChat
+    addAudioMessage(audioBlob);
+  };
 
   // Loan advisor features
   const features = [
@@ -86,6 +93,7 @@ export const LoanAdvisor = () => {
                 messages={messages}
                 isTyping={isTyping}
                 onSendMessage={addMessage}
+                onSendAudio={handleAudioSubmission}
               />
             ) : (
               <div className="h-full overflow-y-auto p-6 sm:p-8">

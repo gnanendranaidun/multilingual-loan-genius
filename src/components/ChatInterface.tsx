@@ -5,22 +5,30 @@ import { Message } from '@/hooks/useChat';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/components/ui/use-toast';
 
 interface ChatInterfaceProps {
   messages: Message[];
   isTyping: boolean;
   onSendMessage: (message: string) => void;
+  onSendAudio?: (audioBlob: Blob) => void;
 }
 
 export const ChatInterface = ({ 
   messages, 
   isTyping, 
-  onSendMessage 
+  onSendMessage,
+  onSendAudio
 }: ChatInterfaceProps) => {
   const [inputValue, setInputValue] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { language, t } = useLanguage();
+  const { toast } = useToast();
+  
+  // New refs for audio recording
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -30,6 +38,9 @@ export const ChatInterface = ({
   // Reset recording state when language changes
   useEffect(() => {
     setIsRecording(false);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+    }
   }, [language]);
   
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -40,16 +51,29 @@ export const ChatInterface = ({
     }
   };
   
-  const toggleRecording = () => {
-    // In a real implementation, this would use the Web Speech API
-    // or another speech recognition service
-    setIsRecording(!isRecording);
-    
-    if (!isRecording) {
-      // Simulate speech recognition after a delay
-      setTimeout(() => {
-        setIsRecording(false);
-        // Use language-specific simulated text
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+      
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        
+        // Only call onSendAudio if it exists and we have audio data
+        if (onSendAudio && audioChunksRef.current.length > 0) {
+          onSendAudio(audioBlob);
+        }
+        
+        // Simulate text from speech for now
         let simulatedText = "Can you tell me about personal loans?";
         
         if (language.code === 'es') {
@@ -66,10 +90,58 @@ export const ChatInterface = ({
           simulatedText = "個人ローンについて教えていただけますか？";
         } else if (language.code === 'ar') {
           simulatedText = "هل يمكنك إخباري عن القروض الشخصية؟";
+        } else if (language.code.includes('IN')) {
+          // For Indian languages
+          simulatedText = "Can you tell me about personal loans in India?";
+          
+          if (language.code === 'hi') {
+            simulatedText = "क्या आप मुझे भारत में व्यक्तिगत ऋण के बारे में बता सकते हैं?";
+          }
         }
         
         setInputValue(simulatedText);
-      }, 3000);
+        
+        // Stop all tracks on the stream to release the microphone
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+      };
+      
+      mediaRecorder.start();
+      setIsRecording(true);
+      
+      toast({
+        title: "Recording started",
+        description: "Speak clearly into your microphone.",
+      });
+      
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      toast({
+        variant: "destructive",
+        title: "Microphone access denied",
+        description: "Please allow microphone access to use voice recording.",
+      });
+      setIsRecording(false);
+    }
+  };
+  
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      
+      toast({
+        title: "Recording stopped",
+        description: "Processing your audio...",
+      });
+    }
+  };
+  
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
     }
   };
   
@@ -125,7 +197,9 @@ export const ChatInterface = ({
             type="button"
             size="icon"
             variant="outline"
-            className="shrink-0 h-10 w-10 rounded-full transition-all duration-200"
+            className={`shrink-0 h-10 w-10 rounded-full transition-all duration-200 ${
+              isRecording ? 'bg-red-50 border-red-500 text-red-500 animate-pulse' : ''
+            }`}
             onClick={toggleRecording}
           >
             {isRecording ? (
@@ -147,6 +221,15 @@ export const ChatInterface = ({
                            language.code === 'hi' ? "अपना संदेश लिखें..." :
                            language.code === 'ja' ? "メッセージを入力..." :
                            language.code === 'ar' ? "اكتب رسالتك..." : 
+                           language.code === 'bn-IN' ? "আপনার বার্তা টাইপ করুন..." :
+                           language.code === 'gu-IN' ? "તમારો સંદેશ લખો..." :
+                           language.code === 'kn-IN' ? "ನಿಮ್ಮ ಸಂದೇಶವನ್ನು ಟೈಪ್ ಮಾಡಿ..." :
+                           language.code === 'ml-IN' ? "നിങ്ങളുടെ സന്ദേശം ടൈപ്പ് ചെയ്യുക..." :
+                           language.code === 'mr-IN' ? "तुमचा संदेश टाइप करा..." :
+                           language.code === 'od-IN' ? "ଆପଣଙ୍କ ବାର୍ତ୍ତା ଟାଇପ୍ କରନ୍ତୁ..." :
+                           language.code === 'pa-IN' ? "ਆਪਣਾ ਸੁਨੇਹਾ ਟਾਈਪ ਕਰੋ..." :
+                           language.code === 'ta-IN' ? "உங்கள் செய்தியைத் தட்டச்சு செய்யவும்..." :
+                           language.code === 'te-IN' ? "మీ సందేశాన్ని టైప్ చేయండి..." :
                            "Type your message..."}
               className="pr-10 py-5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-full focus-visible:ring-blue-500"
               dir={language.code === 'ar' ? "rtl" : "ltr"} // Add right-to-left support for Arabic

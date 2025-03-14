@@ -1,6 +1,6 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/components/ui/use-toast';
 
 export type Message = {
   id: string;
@@ -13,6 +13,9 @@ export type ChatOptions = {
   initialMessages?: Message[];
   onMessageReceived?: (message: Message) => void;
 };
+
+// Mock API endpoint for development
+const API_ENDPOINT = 'MY_API_ENDPOINT';
 
 // Mock responses for financial questions in different languages
 const responses = {
@@ -111,6 +114,49 @@ const responses = {
     'education loan': "تساعد القروض التعليمية في تمويل تكاليف التعليم العالي. غالبًا ما يكون لها معدلات فائدة مواتية وشروط سداد تبدأ بعد التخرج.",
     'business loan': "توفر قروض الأعمال رأس المال لبدء أو توسيع الأعمال. تختلف المتطلبات والشروط بناءً على خطة عملك والتوقعات المالية.",
     'default': "أنا مساعدك المالي. يمكنني المساعدة بمعلومات القرض، فحوصات الأهلية، والتوجيه المالي. ماذا تود أن تعرف؟"
+  },
+  'en-IN': {
+    'loan': "I can help you find the right loan for your needs in India. What type of loan are you interested in? Personal, home, auto, education, or business?",
+    'eligibility': "To check your loan eligibility in India, I'll need some information about your finances. What's your annual income, credit score, and employment duration?",
+    'credit': "Your credit score (CIBIL score in India) is an important factor for loan approval. A higher score may qualify you for better interest rates. Would you like tips to improve your credit score?",
+    'interest': "Interest rates in India vary based on loan type, your credit score, income, and market conditions. For specific rates, I'll need more details about your financial situation.",
+    'personal loan': "Personal loans in India can be used for various purposes like debt consolidation or large purchases. They typically have terms of 1-5 years with interest rates between 10-20% depending on your profile.",
+    'home loan': "Home loans in India help finance property purchases. They usually have longer terms (15-30 years) with interest rates between 6.5-9%. Let me know if you'd like to check your eligibility.",
+    'auto loan': "Auto loans in India are specifically for vehicle purchases. They typically have terms of 3-7 years with interest rates between 7-12%, and the vehicle serves as collateral for the loan.",
+    'education loan': "Education loans in India help finance higher education costs. They often have favorable interest rates (8-12%) and repayment terms that begin after graduation.",
+    'business loan': "Business loans in India provide capital for starting or expanding a business. The requirements and terms vary based on your business plan and financial projections.",
+    'default': "I'm your financial assistant for the Indian market. I can help with loan information, eligibility checks, and financial guidance. What would you like to know about?"
+  },
+  'bn-IN': {
+    'default': "আমি আপনার আর্থিক সহকারী। আমি ঋণ সম্পর্কিত তথ্য, যোগ্যতা যাচাই এবং আর্থিক নির্দেশনা সহায়তা করতে পারি। আপনি কি সম্পর্কে জানতে চান?"
+    // Add more Bengali responses as needed
+  },
+  'gu-IN': {
+    'default': "હું તમારો નાણાકીય સહાયક છું. હું લોન માહિતી, પાત્રતા તપાસ અને નાણાકીય માર્ગદર્શન સાથે મદદ કરી શકું છું. તમે શું વિશે જાણવા માંગો છો?"
+    // Add more Gujarati responses as needed
+  },
+  'kn-IN': {
+    'default': "ನಾನು ನಿಮ್ಮ ಹಣಕಾಸು ಸಹಾಯಕ. ನಾನು ಸಾಲ ಮಾಹಿತಿ, ಅರ್ಹತೆ ಪರಿಶೀಲನೆ ಮತ್ತು ಹಣಕಾಸು ಮಾರ್ಗದರ್ಶನದೊಂದಿಗೆ ಸಹಾಯ ಮಾಡಬಲ್ಲೆ. ನೀವು ಯಾವುದರ ಬಗ್ಗೆ ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ?"
+    // Add more Kannada responses as needed
+  },
+  // Add similar default responses for other Indian languages
+  'ml-IN': {
+    'default': "ഞാൻ നിങ്ങളുടെ ധനകാര്യ സഹായിയാണ്. എനിക്ക് വായ്പാ വിവരങ്ങൾ, യോഗ്യതാ പരിശോധനകൾ, ധനകാര്യ മാർഗ്ഗനിർദ്ദേശങ്ങൾ എന്നിവയിൽ സഹായിക്കാൻ കഴിയും. നിങ്ങൾക്ക് എന്തിനെക്കുറിച്ച് അറിയാൻ ആഗ്രഹമുണ്ട്?"
+  },
+  'mr-IN': {
+    'default': "मी तुमचा आर्थिक सहाय्यक आहे. मी कर्जाची माहिती, पात्रता तपासणी आणि आर्थिक मार्गदर्शनासह मदत करू शकतो. तुम्हाला कशाबद्दल जाणून घ्यायला आवडेल?"
+  },
+  'od-IN': {
+    'default': "ମୁଁ ଆପଣଙ୍କର ଆର୍ଥିକ ସହାୟକ। ମୁଁ ଋଣ ସୂଚନା, ଯୋଗ୍ୟତା ଯାଞ୍ଚ, ଏବଂ ଆର୍ଥିକ ମାର୍ଗଦର୍ଶନ ସହ ସାହାଯ୍ୟ କରିପାରିବି। ଆପଣ କ'ଣ ବିଷୟରେ ଜାଣିବାକୁ ଚାହାଁନ୍ତି?"
+  },
+  'pa-IN': {
+    'default': "ਮੈਂ ਤੁਹਾਡਾ ਵਿੱਤੀ ਸਹਾਇਕ ਹਾਂ। ਮੈਂ ਲੋਨ ਜਾਣਕਾਰੀ, ਯੋਗਤਾ ਜਾਂਚ, ਅਤੇ ਵਿੱਤੀ ਮਾਰਗਦਰਸ਼ਨ ਦੇ ਨਾਲ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ। ਤੁਸੀਂ ਕਿਸ ਬਾਰੇ ਜਾਣਨਾ ਚਾਹੁੰਦੇ ਹੋ?"
+  },
+  'ta-IN': {
+    'default': "நான் உங்கள் நிதி உதவியாளர். கடன் தகவல், தகுதி சோதனைகள், மற்றும் நிதி வழிகாட்டுதலுடன் நான் உதவ முடியும். நீங்கள் எதைப் பற்றி அறிய விரும்புகிறீர்கள்?"
+  },
+  'te-IN': {
+    'default': "నేను మీ ఆర్థిక సహాయకుడిని. నేను రుణ సమాచారం, అర్హత తనిఖీలు మరియు ఆర్థిక మార్గదర్శకత్వంతో సహాయపడగలను. మీరు దేని గురించి తెలుసుకోవాలనుకుంటున్నారు?"
   }
 };
 
@@ -118,6 +164,7 @@ export const useChat = (options: ChatOptions = {}) => {
   const [messages, setMessages] = useState<Message[]>(options.initialMessages || []);
   const [isTyping, setIsTyping] = useState(false);
   const { language } = useLanguage();
+  const { toast } = useToast();
 
   // Function to generate a response based on user input and current language
   const generateResponse = useCallback((userMessage: string): Promise<string> => {
@@ -132,7 +179,7 @@ export const useChat = (options: ChatOptions = {}) => {
       // Check for keywords in the user input
       Object.keys(currentLangResponses).forEach((keyword) => {
         if (userInput.includes(keyword)) {
-          response = currentLangResponses[keyword as keyof typeof currentLangResponses];
+          response = currentLangResponses[keyword as keyof currentLangResponses];
         }
       });
       
@@ -142,6 +189,80 @@ export const useChat = (options: ChatOptions = {}) => {
       }, 1000 + Math.random() * 1000); // 1-2 second delay
     });
   }, [language]);
+  
+  // Function to send text to the API
+  const sendTextToAPI = useCallback(async (text: string): Promise<string> => {
+    // In a real implementation, you would send text to your API
+    // For now, we'll just simulate it
+    try {
+      console.log(`Sending text to API: ${text}`);
+      // Simulate API call
+      // const response = await fetch(API_ENDPOINT, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({ text, language: language.code }),
+      // });
+      
+      // if (!response.ok) {
+      //   throw new Error('Failed to send text to API');
+      // }
+      
+      // const data = await response.json();
+      // return data.response;
+      
+      // For now, just use our mock responses
+      return await generateResponse(text);
+    } catch (error) {
+      console.error('Error sending text to API:', error);
+      return 'Sorry, there was an error processing your request. Please try again.';
+    }
+  }, [generateResponse, language.code]);
+  
+  // Function to send audio to the API
+  const sendAudioToAPI = useCallback(async (audioBlob: Blob): Promise<string> => {
+    // In a real implementation, you would send the audio to your API
+    // For now, we'll just simulate it
+    try {
+      console.log('Sending audio to API...');
+      // Simulate API call
+      // const formData = new FormData();
+      // formData.append('audio', audioBlob);
+      // formData.append('language', language.code);
+      
+      // const response = await fetch(API_ENDPOINT, {
+      //   method: 'POST',
+      //   body: formData,
+      // });
+      
+      // if (!response.ok) {
+      //   throw new Error('Failed to send audio to API');
+      // }
+      
+      // const data = await response.json();
+      // return data.response;
+      
+      // For now, just use a default response
+      toast({
+        title: "Audio processed",
+        description: "Your voice recording has been processed successfully.",
+      });
+      
+      // Mock a response based on language
+      const currentLangResponses = responses[language.code as keyof typeof responses] || responses.en;
+      return currentLangResponses.default;
+      
+    } catch (error) {
+      console.error('Error sending audio to API:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to process your voice recording. Please try again.",
+      });
+      return 'Sorry, there was an error processing your voice recording. Please try again.';
+    }
+  }, [language.code, toast]);
 
   // Add a message to the chat
   const addMessage = useCallback(async (content: string, role: 'user' | 'assistant' | 'system' = 'user') => {
@@ -161,7 +282,7 @@ export const useChat = (options: ChatOptions = {}) => {
     // If it's a user message, generate a response
     if (role === 'user') {
       setIsTyping(true);
-      const responseText = await generateResponse(content);
+      const responseText = await sendTextToAPI(content);
       
       const responseMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -177,7 +298,30 @@ export const useChat = (options: ChatOptions = {}) => {
         options.onMessageReceived(responseMessage);
       }
     }
-  }, [generateResponse, options]);
+  }, [options, sendTextToAPI]);
+  
+  // Function to handle audio submissions
+  const addAudioMessage = useCallback(async (audioBlob: Blob) => {
+    setIsTyping(true);
+    
+    // Process the audio through the API
+    const responseText = await sendAudioToAPI(audioBlob);
+    
+    // Create an assistant message with the response
+    const responseMessage: Message = {
+      id: Date.now().toString(),
+      content: responseText,
+      role: 'assistant',
+      timestamp: new Date(),
+    };
+    
+    setMessages((prev) => [...prev, responseMessage]);
+    setIsTyping(false);
+    
+    if (options.onMessageReceived) {
+      options.onMessageReceived(responseMessage);
+    }
+  }, [options, sendAudioToAPI]);
 
   // Initialize with system message in the current language
   useEffect(() => {
@@ -185,11 +329,12 @@ export const useChat = (options: ChatOptions = {}) => {
       const currentLangResponses = responses[language.code as keyof typeof responses] || responses.en;
       addMessage(currentLangResponses.default, 'assistant');
     }
-  }, [language, messages.length]); // Added language dependency to update initial message if language changes
+  }, [language, messages.length, addMessage]);
 
   return {
     messages,
     isTyping,
     addMessage,
+    addAudioMessage,
   };
 };
