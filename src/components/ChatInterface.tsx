@@ -4,6 +4,7 @@ import { Send, Mic, StopCircle } from 'lucide-react';
 import { Message } from '@/hooks/useChat';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -19,13 +20,19 @@ export const ChatInterface = ({
   const [inputValue, setInputValue] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { language, t } = useLanguage();
   
   // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Reset recording state when language changes
+  useEffect(() => {
+    setIsRecording(false);
+  }, [language]);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (inputValue.trim()) {
       onSendMessage(inputValue);
@@ -42,7 +49,25 @@ export const ChatInterface = ({
       // Simulate speech recognition after a delay
       setTimeout(() => {
         setIsRecording(false);
-        const simulatedText = "Can you tell me about personal loans?";
+        // Use language-specific simulated text
+        let simulatedText = "Can you tell me about personal loans?";
+        
+        if (language.code === 'es') {
+          simulatedText = "¿Puedes contarme sobre préstamos personales?";
+        } else if (language.code === 'fr') {
+          simulatedText = "Pouvez-vous me parler des prêts personnels?";
+        } else if (language.code === 'de') {
+          simulatedText = "Können Sie mir etwas über Privatkredite erzählen?";
+        } else if (language.code === 'zh') {
+          simulatedText = "您能告诉我关于个人贷款的信息吗？";
+        } else if (language.code === 'hi') {
+          simulatedText = "क्या आप मुझे व्यक्तिगत ऋण के बारे में बता सकते हैं?";
+        } else if (language.code === 'ja') {
+          simulatedText = "個人ローンについて教えていただけますか？";
+        } else if (language.code === 'ar') {
+          simulatedText = "هل يمكنك إخباري عن القروض الشخصية؟";
+        }
+        
         setInputValue(simulatedText);
       }, 3000);
     }
@@ -114,8 +139,17 @@ export const ChatInterface = ({
             <Input
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Type your message..."
+              placeholder={language.code === 'en' ? "Type your message..." : 
+                           language.code === 'es' ? "Escribe tu mensaje..." :
+                           language.code === 'fr' ? "Tapez votre message..." :
+                           language.code === 'de' ? "Geben Sie Ihre Nachricht ein..." :
+                           language.code === 'zh' ? "输入您的消息..." :
+                           language.code === 'hi' ? "अपना संदेश लिखें..." :
+                           language.code === 'ja' ? "メッセージを入力..." :
+                           language.code === 'ar' ? "اكتب رسالتك..." : 
+                           "Type your message..."}
               className="pr-10 py-5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-full focus-visible:ring-blue-500"
+              dir={language.code === 'ar' ? "rtl" : "ltr"} // Add right-to-left support for Arabic
             />
             {isRecording && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

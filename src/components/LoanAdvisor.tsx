@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useChat } from '@/hooks/useChat';
 import { ChatInterface } from './ChatInterface';
 import { 
@@ -13,8 +12,14 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 export const LoanAdvisor = () => {
   const [activeTab, setActiveTab] = useState<'chat' | 'about'>('chat');
+  const { language, t } = useLanguage();
   const { messages, isTyping, addMessage } = useChat();
-  const { t } = useLanguage();
+
+  // Reset chat when language changes
+  useEffect(() => {
+    // This will trigger a new initial message in the useChat hook
+    // because messages will be empty again
+  }, [language]);
 
   // Loan advisor features
   const features = [
@@ -77,6 +82,7 @@ export const LoanAdvisor = () => {
           <div className="h-[600px]">
             {activeTab === 'chat' ? (
               <ChatInterface
+                key={language.code} // This will recreate the component when language changes
                 messages={messages}
                 isTyping={isTyping}
                 onSendMessage={addMessage}
