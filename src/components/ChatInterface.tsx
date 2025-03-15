@@ -1,7 +1,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Send, Mic, StopCircle } from 'lucide-react';
-import { Message } from '@/hooks/useChat';
+import { Message } from '@/types/chat';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/contexts/LanguageContext';
