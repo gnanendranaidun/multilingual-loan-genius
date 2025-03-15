@@ -160,6 +160,9 @@ const responses = {
   }
 };
 
+// Define a type for language responses
+type LanguageResponses = typeof responses.en;
+
 export const useChat = (options: ChatOptions = {}) => {
   const [messages, setMessages] = useState<Message[]>(options.initialMessages || []);
   const [isTyping, setIsTyping] = useState(false);
@@ -179,7 +182,7 @@ export const useChat = (options: ChatOptions = {}) => {
       // Check for keywords in the user input
       Object.keys(currentLangResponses).forEach((keyword) => {
         if (userInput.includes(keyword)) {
-          response = currentLangResponses[keyword as keyof currentLangResponses];
+          response = currentLangResponses[keyword as keyof LanguageResponses];
         }
       });
       
