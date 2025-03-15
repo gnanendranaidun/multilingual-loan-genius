@@ -1,4 +1,3 @@
-
 import { useToast } from '@/components/ui/use-toast';
 import responses from '@/data/mockResponses';
 import type { LanguageResponses } from '@/data/mockResponses';
@@ -10,6 +9,7 @@ const API_ENDPOINT = 'https://eab2-103-246-194-81.ngrok-free.app/ask';
 export const sendTextToAPI = async (text: string, languageCode: string, showToast: ReturnType<typeof useToast>['toast']): Promise<string> => {
   try {
     console.log(`Sending text to API: ${text}`);
+    console.log(`Request payload: ${JSON.stringify({ question: text })}`);
     
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
@@ -23,8 +23,18 @@ export const sendTextToAPI = async (text: string, languageCode: string, showToas
       throw new Error(`Failed to send text to API: ${response.status}`);
     }
     
-    const data = await response.json();
-    console.log('API response:', data);
+    const responseText = await response.text();
+    console.log('Raw API response:', responseText);
+    
+    let data;
+    try {
+      data = JSON.parse(responseText);
+      console.log('Parsed API response:', data);
+    } catch (e) {
+      console.log('Response is not JSON, using as plain text');
+      // If it's not JSON, use the raw text as the response
+      return responseText;
+    }
     
     // Return the response content or fall back to mock responses
     if (data && typeof data === 'string') {
@@ -32,6 +42,7 @@ export const sendTextToAPI = async (text: string, languageCode: string, showToas
     } else if (data && data.answer) {
       return data.answer;
     } else {
+      console.log('API returned unexpected format, falling back to mock response');
       // Fallback to mock responses if API fails to return properly formatted data
       return getFallbackResponse(text, languageCode);
     }
@@ -115,7 +126,7 @@ const getSimulatedTextForLanguage = (languageCode: string): string => {
       simulatedText = "क्या आप मुझे व्यक्तिगत ऋण के बारे में बता सकते हैं?";
       break;
     case 'ja':
-      simulatedText = "個人ローンについて教えていただけますか？";
+      simulatedText = "��人ローンについて教えていただけますか？";
       break;
     case 'ar':
       simulatedText = "هل يمكنك إخباري عن القروض الشخصية؟";
@@ -152,4 +163,42 @@ const getFallbackResponse = (text: string, languageCode: string): string => {
   
   console.log('Falling back to mock response');
   return mockResponse;
+};
+
+// Test function to demonstrate the API call directly
+export const testAPICall = async (message: string): Promise<string> => {
+  try {
+    console.log(`Test API call with message: ${message}`);
+    
+    const response = await fetch(API_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ question: message }),
+    });
+    
+    const rawResponse = await response.text();
+    console.log('Raw API response:', rawResponse);
+    
+    let jsonResponse;
+    try {
+      jsonResponse = JSON.parse(rawResponse);
+      console.log('Parsed JSON response:', jsonResponse);
+      
+      if (typeof jsonResponse === 'string') {
+        return jsonResponse;
+      } else if (jsonResponse && jsonResponse.answer) {
+        return jsonResponse.answer;
+      } else {
+        return `Received response in unexpected format: ${rawResponse}`;
+      }
+    } catch (e) {
+      // If it's not valid JSON, return the raw text
+      return `Received plain text response: ${rawResponse}`;
+    }
+  } catch (error) {
+    console.error('Error in test API call:', error);
+    return `Error: ${error instanceof Error ? error.message : String(error)}`;
+  }
 };

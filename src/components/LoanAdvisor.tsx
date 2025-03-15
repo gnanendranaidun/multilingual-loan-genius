@@ -10,11 +10,16 @@ import {
   GraduationCap
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Button } from '@/components/ui/button';
+import { testAPICall } from '@/utils/chatApi';
+import { useToast } from '@/components/ui/use-toast';
 
 export const LoanAdvisor = () => {
   const [activeTab, setActiveTab] = useState<'chat' | 'about'>('chat');
   const { language, t } = useLanguage();
   const { messages, isTyping, addMessage, addAudioMessage } = useChat();
+  const { toast } = useToast();
+  const [apiTestResult, setApiTestResult] = useState<string | null>(null);
 
   // Reset chat when language changes
   useEffect(() => {
@@ -26,6 +31,33 @@ export const LoanAdvisor = () => {
   const handleAudioSubmission = (audioBlob: Blob) => {
     // Call the addAudioMessage function from useChat
     addAudioMessage(audioBlob);
+  };
+
+  // Test the API directly
+  const handleTestAPI = async () => {
+    try {
+      toast({
+        title: "Testing API",
+        description: "Sending test message to API...",
+      });
+      
+      const testMessage = "Hello, this is a test message.";
+      const result = await testAPICall(testMessage);
+      
+      setApiTestResult(result);
+      
+      toast({
+        title: "API Test Complete",
+        description: "Check the result below the chat window.",
+      });
+    } catch (error) {
+      console.error("API test failed:", error);
+      toast({
+        variant: "destructive",
+        title: "API Test Failed",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+      });
+    }
   };
 
   // Loan advisor features
@@ -88,13 +120,34 @@ export const LoanAdvisor = () => {
           {/* Content */}
           <div className="h-[600px]">
             {activeTab === 'chat' ? (
-              <ChatInterface
-                key={language.code} // This will recreate the component when language changes
-                messages={messages}
-                isTyping={isTyping}
-                onSendMessage={addMessage}
-                onSendAudio={handleAudioSubmission}
-              />
+              <>
+                <ChatInterface
+                  key={language.code} // This will recreate the component when language changes
+                  messages={messages}
+                  isTyping={isTyping}
+                  onSendMessage={addMessage}
+                  onSendAudio={handleAudioSubmission}
+                />
+                <div className="px-4 pb-3">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleTestAPI}
+                    className="w-full mt-2"
+                  >
+                    Test API Connection
+                  </Button>
+                  
+                  {apiTestResult && (
+                    <div className="mt-2 p-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm overflow-auto max-h-32">
+                      <p className="font-semibold">API Response:</p>
+                      <pre className="whitespace-pre-wrap break-words">
+                        {apiTestResult}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
               <div className="h-full overflow-y-auto p-6 sm:p-8">
                 <div className="space-y-8">
