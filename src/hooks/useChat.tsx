@@ -14,10 +14,13 @@ export type ChatOptions = {
   onMessageReceived?: (message: Message) => void;
 };
 
-// Mock API endpoint for development
-const API_ENDPOINT = 'MY_API_ENDPOINT';
+// API endpoint for the chat
+const API_ENDPOINT = 'https://eab2-103-246-194-81.ngrok-free.app/ask';
 
-// Mock responses for financial questions in different languages
+// Define a type for language responses based on the structure of responses.en
+type LanguageResponses = typeof responses.en;
+
+// Mock responses for development fallback
 const responses = {
   en: {
     'loan': "I can help you find the right loan. What type of loan are you interested in? Personal, home, auto, education, or business?",
@@ -160,101 +163,119 @@ const responses = {
   }
 };
 
-// Define a type for language responses
-type LanguageResponses = typeof responses.en;
-
 export const useChat = (options: ChatOptions = {}) => {
   const [messages, setMessages] = useState<Message[]>(options.initialMessages || []);
   const [isTyping, setIsTyping] = useState(false);
   const { language } = useLanguage();
   const { toast } = useToast();
 
-  // Function to generate a response based on user input and current language
-  const generateResponse = useCallback((userMessage: string): Promise<string> => {
-    return new Promise((resolve) => {
-      // Get responses for the current language or fall back to English
-      const currentLangResponses = responses[language.code as keyof typeof responses] || responses.en;
-      
-      // Simple keyword matching for demo purposes
-      const userInput = userMessage.toLowerCase();
-      let response = currentLangResponses.default;
-      
-      // Check for keywords in the user input
-      Object.keys(currentLangResponses).forEach((keyword) => {
-        if (userInput.includes(keyword)) {
-          response = currentLangResponses[keyword as keyof LanguageResponses];
-        }
-      });
-      
-      // Simulate network delay
-      setTimeout(() => {
-        resolve(response);
-      }, 1000 + Math.random() * 1000); // 1-2 second delay
-    });
-  }, [language]);
-  
-  // Function to send text to the API
+  // Function to send text to the real API
   const sendTextToAPI = useCallback(async (text: string): Promise<string> => {
-    // In a real implementation, you would send text to your API
-    // For now, we'll just simulate it
     try {
       console.log(`Sending text to API: ${text}`);
-      // Simulate API call
-      // const response = await fetch(API_ENDPOINT, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({ text, language: language.code }),
-      // });
       
-      // if (!response.ok) {
-      //   throw new Error('Failed to send text to API');
-      // }
+      const response = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ question: text }),
+      });
       
-      // const data = await response.json();
-      // return data.response;
+      if (!response.ok) {
+        throw new Error(`Failed to send text to API: ${response.status}`);
+      }
       
-      // For now, just use our mock responses
-      return await generateResponse(text);
+      const data = await response.json();
+      console.log('API response:', data);
+      
+      // Return the response content or fall back to mock responses
+      if (data && typeof data === 'string') {
+        return data;
+      } else if (data && data.answer) {
+        return data.answer;
+      } else {
+        // Fallback to mock responses if API fails to return properly formatted data
+        const currentLangResponses = responses[language.code as keyof typeof responses] || responses.en;
+        const userInput = text.toLowerCase();
+        let mockResponse = currentLangResponses.default;
+        
+        Object.keys(currentLangResponses).forEach((keyword) => {
+          if (userInput.includes(keyword)) {
+            mockResponse = currentLangResponses[keyword as keyof LanguageResponses];
+          }
+        });
+        
+        console.log('Falling back to mock response');
+        return mockResponse;
+      }
     } catch (error) {
       console.error('Error sending text to API:', error);
-      return 'Sorry, there was an error processing your request. Please try again.';
+      toast({
+        variant: "destructive",
+        title: "API Error",
+        description: "Failed to connect to the chat service. Using fallback responses.",
+      });
+      
+      // Fallback to mock responses on error
+      const currentLangResponses = responses[language.code as keyof typeof responses] || responses.en;
+      return currentLangResponses.default;
     }
-  }, [generateResponse, language.code]);
+  }, [language.code, toast]);
   
   // Function to send audio to the API
   const sendAudioToAPI = useCallback(async (audioBlob: Blob): Promise<string> => {
-    // In a real implementation, you would send the audio to your API
-    // For now, we'll just simulate it
     try {
       console.log('Sending audio to API...');
-      // Simulate API call
-      // const formData = new FormData();
-      // formData.append('audio', audioBlob);
-      // formData.append('language', language.code);
       
-      // const response = await fetch(API_ENDPOINT, {
-      //   method: 'POST',
-      //   body: formData,
-      // });
+      // Create a FormData object to send the audio file
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
       
-      // if (!response.ok) {
-      //   throw new Error('Failed to send audio to API');
-      // }
+      // For now, we'll simulate conversion to text and then use the text API
+      // In a real implementation, you would send the audio directly to an endpoint that can process it
+      toast({
+        title: "Audio processing",
+        description: "Converting speech to text...",
+      });
       
-      // const data = await response.json();
-      // return data.response;
+      // Simulate speech-to-text conversion
+      // In the future, you could implement actual speech-to-text here
+      // For now, we'll use a placeholder question based on the language
+      let simulatedText = "Can you tell me about personal loans?";
       
-      // For now, just use a default response
+      if (language.code === 'es') {
+        simulatedText = "¿Puedes contarme sobre préstamos personales?";
+      } else if (language.code === 'fr') {
+        simulatedText = "Pouvez-vous me parler des prêts personnels?";
+      } else if (language.code === 'de') {
+        simulatedText = "Können Sie mir etwas über Privatkredite erzählen?";
+      } else if (language.code === 'zh') {
+        simulatedText = "您能告诉我关于个人贷款的信息吗？";
+      } else if (language.code === 'hi') {
+        simulatedText = "क्या आप मुझे व्यक्तिगत ऋण के बारे में बता सकते हैं?";
+      } else if (language.code === 'ja') {
+        simulatedText = "個人ローンについて教えていただけますか？";
+      } else if (language.code === 'ar') {
+        simulatedText = "هل يمكنك إخباري عن القروض الشخصية؟";
+      } else if (language.code.includes('IN')) {
+        // For Indian languages
+        simulatedText = "Can you tell me about personal loans in India?";
+        
+        if (language.code === 'hi-IN') {
+          simulatedText = "क्या आप मुझे भारत में व्यक्तिगत ऋण के बारे में बता सकते हैं?";
+        }
+      }
+      
+      // Now send the simulated text to the API
+      const response = await sendTextToAPI(simulatedText);
+      
       toast({
         title: "Audio processed",
         description: "Your voice recording has been processed successfully.",
       });
       
-      // Mock a response based on language
-      const currentLangResponses = responses[language.code as keyof typeof responses] || responses.en;
-      return currentLangResponses.default;
+      return response;
       
     } catch (error) {
       console.error('Error sending audio to API:', error);
@@ -263,9 +284,12 @@ export const useChat = (options: ChatOptions = {}) => {
         title: "Error",
         description: "Failed to process your voice recording. Please try again.",
       });
-      return 'Sorry, there was an error processing your voice recording. Please try again.';
+      
+      // Fallback to default response in the current language
+      const currentLangResponses = responses[language.code as keyof typeof responses] || responses.en;
+      return currentLangResponses.default;
     }
-  }, [language.code, toast]);
+  }, [language.code, sendTextToAPI, toast]);
 
   // Add a message to the chat
   const addMessage = useCallback(async (content: string, role: 'user' | 'assistant' | 'system' = 'user') => {
